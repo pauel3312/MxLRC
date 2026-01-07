@@ -302,6 +302,7 @@ def main(args):
 
       if idx + 1 < args.songs['count']:
         c += 1
+        print(f'    Waiting for {args.sleep}s    ')
         for sec in range(args.sleep, -1, -1):
           print(f'    Please wait... {sec}s    ', end='\r')
           time.sleep(1)
