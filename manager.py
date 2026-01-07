@@ -9,7 +9,7 @@ MXLRC_PATH = "/home/pauel/MxLRC"
 DONE_FOLDERS_LIST = f"{MXLRC_PATH}/done.txt"
 
 def make_command(music_folder: posix.DirEntry, token: str) -> str:
-    return f'{MXLRC_PATH}/.venv/bin/python3 {quote(f"{MXLRC_PATH}/mxlrc.py")} -s {quote(music_folder.path)} --token {token} -t 60'
+    return f'{MXLRC_PATH}/.venv/bin/python3 {quote(f"{MXLRC_PATH}/mxlrc.py")} -s {quote(music_folder.path)} --token {token} -t 60 -q'
 
 class Token:
     def __init__(self, value: str):
