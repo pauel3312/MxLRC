@@ -14,10 +14,9 @@ def make_command(music_folder: posix.DirEntry, token: str) -> str:
 class Token:
     def __init__(self, value: str):
         self.value:str = value
-        self.sem = asyncio.Semaphore(1)
 
-async def run_command(cur_folder: posix.DirEntry, token: Token):
-    await token.sem.acquire()
+async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
+    token = await queue.get()
 
     command = make_command(cur_folder, token.value)
 
@@ -59,25 +58,23 @@ async def run_command(cur_folder: posix.DirEntry, token: Token):
             if process.returncode is None:
                 process.kill()
                 await process.wait()
+            queue.put_nowait(token)
+
     os.system(f"echo {quote(cur_folder.path)}\n >> {DONE_FOLDERS_LIST}")
-    token.sem.release()
 
 
 async def main(tokens: list[Token]):
-    async def token_selector():
-        while True:
-            for token in tokens:
-                if not token.sem.locked():
-                    return token
-            await asyncio.sleep(1)
 
     tasks: list[asyncio.Task] = []
+    token_queue = asyncio.Queue()
+
+    for t in tokens:
+        token_queue.put_nowait(t)
 
     for folder in os.scandir(MUSIC_PATH):
         if not os.path.isdir(folder):
             continue
-        token = await token_selector()
-        task = asyncio.create_task(run_command(folder, token))
+        task = asyncio.create_task(run_command(folder, token_queue))
         tasks.append(task)
 
     await asyncio.gather(*tasks)
