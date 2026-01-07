@@ -60,7 +60,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
                 await process.wait()
             queue.put_nowait(token)
 
-    os.system(f"echo {quote(cur_folder.path+'\n')} >> {DONE_FOLDERS_LIST}")
+    os.system(f"echo {quote(cur_folder.path)} >> {DONE_FOLDERS_LIST}")
 
 
 async def main(tokens: list[Token]):
