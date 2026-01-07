@@ -49,8 +49,8 @@ async def run_command(cur_folder: posix.DirEntry, token: Token):
             await process.wait()
 
             if restart:
-                print("Timeout detected, restarting in 60 seconds...")
-                await asyncio.sleep(60)
+                print("Timeout detected, restarting in 10 minutes...")
+                await asyncio.sleep(600)
                 continue  # restart loop
 
             break  # normal exit → done
