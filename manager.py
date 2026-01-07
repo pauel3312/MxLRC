@@ -3,10 +3,10 @@ import posix
 from shellescape import quote
 import asyncio
 
-MUSIC_PATH = "/home/pauel/MxLRC/test_files/Colette Magny"
+MUSIC_PATH = "/var/jellyfin/media/music"
 MXLRC_PATH = "/home/pauel/MxLRC"
 
-DONE_FOLDERS_LIST = "/home/pauel/MxLRC/done.txt"
+DONE_FOLDERS_LIST = f"{MXLRC_PATH}/done.txt"
 
 def make_command(music_folder: posix.DirEntry, token: str) -> str:
     return f'{MXLRC_PATH}/.venv/bin/python3 {quote(f"{MXLRC_PATH}/mxlrc.py")} -s {quote(music_folder.path)} --token {token} -t 60'
@@ -30,11 +30,11 @@ async def run_command(cur_folder: posix.DirEntry, token: Token):
 
         try:
             restart = False
-            async def monitor(stream):
+            async def monitor(stream, stream_name:str):
                 nonlocal restart
                 async for line in stream:
                     text = line.decode().rstrip()
-                    print(text)
+                    print(f"[{stream_name}] {text}")
 
                     if text.startswith("[o] Timed out."):
                         restart = True
@@ -42,8 +42,8 @@ async def run_command(cur_folder: posix.DirEntry, token: Token):
                         break
 
             await asyncio.gather(
-                monitor(process.stdout),
-                monitor(process.stderr),
+                monitor(process.stdout, f"...{token.value[-4:]}-stdout"),
+                monitor(process.stderr, f"...{token.value[-4:]}-stderr"),
             )
 
             await process.wait()
