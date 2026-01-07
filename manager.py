@@ -3,7 +3,7 @@ import posix
 from shellescape import quote
 import asyncio
 
-MUSIC_PATH = "/home/pauel/MxLRC/test_files/Colette Magny"
+MUSIC_PATH = "/var/jellyfin/media/music"
 MXLRC_PATH = "/home/pauel/MxLRC"
 
 DONE_FOLDERS_LIST = f"{MXLRC_PATH}/done.txt"
