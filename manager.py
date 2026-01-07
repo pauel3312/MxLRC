@@ -6,6 +6,8 @@ import asyncio
 MUSIC_PATH = "/home/pauel/MxLRC/test_files/Colette Magny"
 MXLRC_PATH = "/home/pauel/MxLRC"
 
+DONE_FOLDERS_LIST = "/home/pauel/MxLRC/done.txt"
+
 def make_command(music_folder: posix.DirEntry, token: str) -> str:
     return f'{MXLRC_PATH}/.venv/bin/python3 {quote(f"{MXLRC_PATH}/mxlrc.py")} -s {quote(music_folder.path)} --token {token} -t 60'
 
@@ -28,7 +30,6 @@ async def run_command(cur_folder: posix.DirEntry, token: Token):
 
         try:
             restart = False
-
             async def monitor(stream):
                 nonlocal restart
                 async for line in stream:
@@ -58,6 +59,7 @@ async def run_command(cur_folder: posix.DirEntry, token: Token):
             if process.returncode is None:
                 process.kill()
                 await process.wait()
+    os.system(f"echo {quote(cur_folder.path)}\n >> {DONE_FOLDERS_LIST}")
     token.sem.release()
 
 
