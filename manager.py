@@ -48,7 +48,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
             await process.wait()
 
             if restart:
-                print("Timeout detected, restarting in 10 minutes...")
+                print(f"[...{token.value[-4:]}-mgr] Timeout detected, restarting in 10 minutes...")
                 await asyncio.sleep(600)
                 continue  # restart loop
 
