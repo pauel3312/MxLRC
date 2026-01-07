@@ -3,7 +3,7 @@ import posix
 from shellescape import quote
 import asyncio
 
-MUSIC_PATH = "/var/jellyfin/media/music"
+MUSIC_PATH = "/home/pauel/MxLRC/test_files/Colette Magny"
 MXLRC_PATH = "/home/pauel/MxLRC"
 
 DONE_FOLDERS_LIST = f"{MXLRC_PATH}/done.txt"
@@ -60,7 +60,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
                 await process.wait()
             queue.put_nowait(token)
 
-    os.system(f"echo {quote(cur_folder.path)}\n >> {DONE_FOLDERS_LIST}")
+    os.system(f"echo {quote(cur_folder.path+'\n')} >> {DONE_FOLDERS_LIST}")
 
 
 async def main(tokens: list[Token]):
