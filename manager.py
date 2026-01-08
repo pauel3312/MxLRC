@@ -63,9 +63,9 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
             if process.returncode is None:
                 process.kill()
                 await process.wait()
+
     queue.put_nowait(token)
     print(f"[...{token.value[-4:]}-prcmgr] Finished processing {cur_folder.path}")
-
     os.system(f"echo {quote(cur_folder.path)} >> {DONE_FOLDERS_LIST}")
 
 
@@ -96,13 +96,13 @@ if __name__ == "__main__":
     tokens_file = open("TOKENS", "r")
     text_tokens = tokens_file.readlines()
     tokens_file.close()
-    tokens: list[Token | None] = [None]*len(text_tokens)
-    i = 0
-    for i, t in enumerate(text_tokens):
-        tokens[i] = Token(t.strip(), 9+i)
-        i = (i+1)%6
+    list_tokens: list[Token | None] = [None] * len(text_tokens)
+    colour_index = 0
+    for (index, temp_token) in enumerate(text_tokens):
+        list_tokens[index] = Token(temp_token.strip(), 9 + colour_index)
+        colour_index = (colour_index + 1) % 6
 
-    asyncio.run(main(tokens))
+    asyncio.run(main(list_tokens))
 
 
 
