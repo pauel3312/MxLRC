@@ -110,7 +110,7 @@ class Musixmatch:
         return False
     logging.info("Formatting lyrics")
     tags = [
-      "[by:fashni]\n",
+      "[by:pauel]\n",
       f"[ar:{song.artist}]\n",
       f"[ti:{song.title}]\n",
     ]

@@ -59,7 +59,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
             if process.returncode is None:
                 process.kill()
                 await process.wait()
-            queue.put_nowait(token)
+    queue.put_nowait(token)
     print(f"[...{token.value[-4:]}-prcmgr] Finished processing {cur_folder.path}")
 
     os.system(f"echo {quote(cur_folder.path)} >> {DONE_FOLDERS_LIST}")
