@@ -30,7 +30,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
 
         try:
             restart = False
-            async def monitor(stream: asyncio.streams.streamReader, stream_name:str):
+            async def monitor(stream: asyncio.streams.StreamReader, stream_name:str):
                 nonlocal restart
                 async for line in stream:
                     text = line.decode().rstrip()
