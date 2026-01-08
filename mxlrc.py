@@ -302,11 +302,12 @@ def main(args):
 
       if idx + 1 < args.songs['count']:
         c += 1
-        print(f'    Waiting for {args.sleep}s    ')
-        for sec in range(args.sleep, -1, -1):
-          print(f'    Please wait... {sec}s    ', end='\r')
-          time.sleep(1)
-        print('')
+        logging.warning(f"Waiting for {args.sleep} seconds...")
+        if not args.quiet:
+          for sec in range(args.sleep, -1, -1):
+            print(f'    Please wait... {sec}s    ', end='\r')
+            time.sleep(1)
+          print('')
     except KeyboardInterrupt as e:
       logging.warning(repr(e))
       failed += songs[c:]

@@ -2,6 +2,7 @@ import os
 import posix
 from shellescape import quote
 import asyncio
+import asyncio.streams
 
 MUSIC_PATH = "/var/jellyfin/media/music"
 MXLRC_PATH = "/home/pauel/MxLRC"
@@ -29,7 +30,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
 
         try:
             restart = False
-            async def monitor(stream, stream_name:str):
+            async def monitor(stream: asyncio.streams.streamReader, stream_name:str):
                 nonlocal restart
                 async for line in stream:
                     text = line.decode().rstrip()
@@ -48,7 +49,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
             await process.wait()
 
             if restart:
-                print(f"[...{token.value[-4:]}-mgr] Timeout detected, restarting in 10 minutes...")
+                print(f"[...{token.value[-4:]}-prcmgr] Timeout detected, restarting in 10 minutes...")
                 await asyncio.sleep(600)
                 continue  # restart loop
 
@@ -59,6 +60,7 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
                 process.kill()
                 await process.wait()
             queue.put_nowait(token)
+    print(f"[...{token.value[-4:]}-prcmgr] Finished processing {cur_folder.path}")
 
     os.system(f"echo {quote(cur_folder.path)} >> {DONE_FOLDERS_LIST}")
 
