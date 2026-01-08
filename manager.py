@@ -9,12 +9,16 @@ MXLRC_PATH = "/home/pauel/MxLRC"
 
 DONE_FOLDERS_LIST = f"{MXLRC_PATH}/done.txt"
 
+def colour_text(text: str, colour: int) -> str:
+    return f"\033[38;5;{colour}m{text}\033[0m"
+
 def make_command(music_folder: posix.DirEntry, token: str) -> str:
     return f'{MXLRC_PATH}/.venv/bin/python3 {quote(f"{MXLRC_PATH}/mxlrc.py")} -s {quote(music_folder.path)} --token {token} -t 60 -q'
 
 class Token:
-    def __init__(self, value: str):
+    def __init__(self, value: str, color: int):
         self.value:str = value
+        self.colour: int = color
 
 async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
     token = await queue.get()
@@ -42,14 +46,14 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
                         break
 
             await asyncio.gather(
-                monitor(process.stdout, f"...{token.value[-4:]}-stdout"),
-                monitor(process.stderr, f"...{token.value[-4:]}-stderr"),
+                monitor(process.stdout, colour_text(f"...{token.value[-4:]}-stdout", token.colour)),
+                monitor(process.stderr, colour_text(f"...{token.value[-4:]}-stderr", token.colour)),
             )
 
             await process.wait()
 
             if restart:
-                print(f"[...{token.value[-4:]}-prcmgr] Timeout detected, restarting in 10 minutes...")
+                print(colour_text(f"[...{token.value[-4:]}-prcmgr] Timeout detected, restarting in 10 minutes...", token.colour))
                 await asyncio.sleep(600)
                 continue  # restart loop
 
@@ -93,8 +97,10 @@ if __name__ == "__main__":
     text_tokens = tokens_file.readlines()
     tokens_file.close()
     tokens: list[Token | None] = [None]*len(text_tokens)
+    i = 0
     for i, t in enumerate(text_tokens):
-        tokens[i] = Token(t.strip())
+        tokens[i] = Token(t.strip(), 9+i)
+        i = (i+1)%6
 
     asyncio.run(main(tokens))
 
