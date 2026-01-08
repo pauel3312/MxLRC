@@ -308,6 +308,8 @@ def main(args):
             print(f'    Please wait... {sec}s    ', end='\r')
             time.sleep(1)
           print('')
+        else:
+          time.sleep(args.sleep)
     except KeyboardInterrupt as e:
       logging.warning(repr(e))
       failed += songs[c:]
