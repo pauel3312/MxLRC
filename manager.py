@@ -65,6 +65,11 @@ async def run_command(cur_folder: posix.DirEntry, queue: asyncio.Queue[Token]):
 
 async def main(tokens: list[Token]):
 
+    done_folders_file = open(DONE_FOLDERS_LIST, "r")
+    done_folders = done_folders_file.readlines()
+    for i, folder in enumerate(done_folders):
+        done_folders[i] = folder.strip()
+
     tasks: list[asyncio.Task] = []
     token_queue = asyncio.Queue()
 
@@ -72,7 +77,7 @@ async def main(tokens: list[Token]):
         token_queue.put_nowait(t)
 
     for folder in os.scandir(MUSIC_PATH):
-        if not os.path.isdir(folder):
+        if not os.path.isdir(folder) or folder.path in done_folders:
             continue
         task = asyncio.create_task(run_command(folder, token_queue))
         tasks.append(task)
