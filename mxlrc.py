@@ -14,7 +14,9 @@ from tinytag import TinyTag
 
 
 class Musixmatch:
-  base_url = "https://apic-desktop.musixmatch.com/ws/1.1/macro.subtitles.get?format=json&namespace=lyrics_richsynched&subtitle_format=mxm&app_id=web-desktop-app-v1.0&"
+  search_url = "https://apic-desktop.musixmatch.com/ws/1.1/track.search?format=json&namespace=lyrics_richsynched&subtitle_format=mxm&app_id=web-desktop-app-v1.0&"
+  get_url = "https://apic-desktop.musixmatch.com/ws/1.1/macro.subtitles.get?format=json&namespace=lyrics_richsynched&subtitle_format=mxm&app_id=web-desktop-app-v1.0&"
+
   headers = {"authority": "apic-desktop.musixmatch.com", "cookie": "x-mxm-token-guid="}
 
   def __init__(self, token=None):
@@ -36,7 +38,7 @@ class Musixmatch:
       "usertoken": self.token,
     }
 
-    req = urllib.request.Request(self.base_url + urllib.parse.urlencode(params, quote_via=urllib.parse.quote), headers=self.headers)
+    req = urllib.request.Request(self.search_url + urllib.parse.urlencode(params, quote_via=urllib.parse.quote), headers=self.headers)
     try:
       response = urllib.request.urlopen(req).read()
     except (urllib.error.HTTPError, urllib.error.URLError, ConnectionResetError) as e:
@@ -47,6 +49,21 @@ class Musixmatch:
     if r['message']['header']['status_code'] != 200 and r['message']['header'].get('hint') == 'renew':
       logging.error("Invalid token")
       return
+
+    tracks: list = r['message']['body']['track_list']
+    track_id = tracks[0]['track']['track_id']
+    req = urllib.request.Request(self.get_url + urllib.parse.urlencode({"track_id": track_id, "usertoken": self.token}, quote_via=urllib.parse.quote), headers=self.headers)
+    try:
+      response = urllib.request.urlopen(req).read()
+    except (urllib.error.HTTPError, urllib.error.URLError, ConnectionResetError) as e:
+      logging.error(repr(e))
+      return
+
+    r = json.loads(response.decode())
+    if r['message']['header']['status_code'] != 200 and r['message']['header'].get('hint') == 'renew':
+      logging.error("Invalid token")
+      return
+
     body = r["message"]["body"]["macro_calls"]
 
     if body["matcher.track.get"]["message"]["header"]["status_code"] != 200:
