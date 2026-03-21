@@ -46,11 +46,19 @@ class Musixmatch:
       return
 
     r = json.loads(response.decode())
-    if r['message']['header']['status_code'] != 200 and r['message']['header'].get('hint') == 'renew':
+    if r['message']['header']['status_code'] != 200 and r['message']['header'].get('hint') in ('renew', 'captcha'):
       logging.error("Invalid token")
       return
 
     tracks: list = r['message']['body']['track_list']
+    i = 0
+    while i < len(tracks):
+      try:
+        a = int(tracks[i]['track']['commontrack_vanity_id'].split("/")[0].split("-")[-1])
+      except ValueError as e:
+        i += 1
+      else:
+        tracks.pop(i)
     track_id = tracks[0]['track']['track_id']
     req = urllib.request.Request(self.get_url + urllib.parse.urlencode({"track_id": track_id, "usertoken": self.token}, quote_via=urllib.parse.quote), headers=self.headers)
     try:
