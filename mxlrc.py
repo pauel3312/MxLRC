@@ -46,8 +46,12 @@ class Musixmatch:
       return
 
     r = json.loads(response.decode())
-    if r['message']['header']['status_code'] != 200 and r['message']['header'].get('hint') in ('renew', 'captcha'):
-      logging.error("Invalid token")
+    if r['message']['header']['status_code'] != 200:
+      match r['message']['header'].get('hint'):
+        case 'renew':
+          logging.error("Invalid token")
+        case 'captcha':
+          logging.warning("Timed out. Change the token or wait a few minutes before trying again.")
       return
 
     tracks: list = r['message']['body']['track_list']
